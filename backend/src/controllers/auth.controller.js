@@ -90,3 +90,33 @@ export const logout = (req, res) => {
         res.status(500).json({ message: "Internal server error." });
     }
 };
+
+export const updateProfile = async (req, res) => {
+    const userId = req.user._id;
+    const { username, email, profilePic } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        if (username) user.username = username;
+        if (email) user.email = email;
+        if (profilePic) user.profilePic = profilePic;
+
+        await user.save();
+
+        res.status(200).json({
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            profilePic: user.profilePic,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        });
+    } catch (error) {
+        console.log("Error in updateProfile:", error.message);
+        res.status(500).json({ message: "Internal server error." });
+    }
+};
